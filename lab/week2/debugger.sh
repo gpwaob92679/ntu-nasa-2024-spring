@@ -8,7 +8,7 @@ gcc "$1" -o gen
 gcc "$2" -o a
 gcc "$3" -o b
 
-for (( i = 1; i <= "$4"; i += 1 )); do
+for (( i = 1; i <= "$4"; ++i )); do
   input="$(./gen "${i}")"
   output_a="$(echo "${input}" | ./a)"
   output_b="$(echo "${input}" | ./b)"
@@ -19,13 +19,14 @@ for (( i = 1; i <= "$4"; i += 1 )); do
     echo "${SEP}"
     echo "${input}"
     echo "${SEP}"
-    echo "Output of $2":
+    echo "Output of $2:"
     echo "${SEP}"
     echo "${output_a}"
     echo "${SEP}"
-    echo "Output of $3":
+    echo "Output of $3:"
     echo "${SEP}"
     echo "${output_b}"
     echo "${SEP}"
+    exit
   fi
 done
