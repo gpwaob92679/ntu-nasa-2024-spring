@@ -13,7 +13,7 @@ for (( i = 1; i <= "$4"; ++i )); do
   output_a="$(./a < in.txt)"
   output_b="$(./b < in.txt)"
 
-  if ! diff <(echo "${output_a}") <(echo "${output_b}") > /dev/null; then
+  if ! diff <(echo -E "${output_a}") <(echo -E "${output_b}") > /dev/null; then
     echo "Test ${i}:"
     echo "Input:"
     echo "${SEP}"
@@ -21,11 +21,11 @@ for (( i = 1; i <= "$4"; ++i )); do
     echo "${SEP}"
     echo "Output of $2:"
     echo "${SEP}"
-    echo "${output_a}"
+    echo -E "${output_a}"
     echo "${SEP}"
     echo "Output of $3:"
     echo "${SEP}"
-    echo "${output_b}"
+    echo -E "${output_b}"
     echo "${SEP}"
     exit
   fi
