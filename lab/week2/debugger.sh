@@ -9,15 +9,15 @@ gcc "$2" -o a
 gcc "$3" -o b
 
 for (( i = 1; i <= "$4"; ++i )); do
-  input="$(./gen "${i}")"
-  output_a="$(echo "${input}" | ./a)"
-  output_b="$(echo "${input}" | ./b)"
+  ./gen "${i}" > in.txt
+  output_a="$(./a < in.txt)"
+  output_b="$(./b < in.txt)"
 
   if ! diff <(echo "${output_a}") <(echo "${output_b}") > /dev/null; then
     echo "Test ${i}:"
     echo "Input:"
     echo "${SEP}"
-    echo "${input}"
+    cat in.txt
     echo "${SEP}"
     echo "Output of $2:"
     echo "${SEP}"
