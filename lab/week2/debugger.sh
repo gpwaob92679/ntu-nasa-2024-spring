@@ -4,9 +4,9 @@
 
 readonly SEP="--------------------"
 
-gcc "$1" -o gen
-gcc "$2" -o a
-gcc "$3" -o b
+gcc -o gen "$1"
+gcc -o a "$2"
+gcc -o b "$3"
 
 for (( i = 1; i <= "$4"; ++i )); do
   ./gen "${i}" > in.txt
