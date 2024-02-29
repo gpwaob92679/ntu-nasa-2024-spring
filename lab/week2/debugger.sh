@@ -10,10 +10,10 @@ gcc -o b "$3"
 
 for (( i = 1; i <= "$4"; ++i )); do
   ./gen "${i}" > in.txt
-  output_a="$(./a < in.txt)"
-  output_b="$(./b < in.txt)"
+  ./a < in.txt > out_a.txt
+  ./b < in.txt > out_b.txt
 
-  if ! diff <(echo -E "${output_a}") <(echo -E "${output_b}") > /dev/null; then
+  if ! diff out_a.txt out_b.txt > /dev/null; then
     echo "Test ${i}:"
     echo "Input:"
     echo "${SEP}"
@@ -21,11 +21,11 @@ for (( i = 1; i <= "$4"; ++i )); do
     echo "${SEP}"
     echo "Output of $2:"
     echo "${SEP}"
-    echo -E "${output_a}"
+    cat out_a.txt
     echo "${SEP}"
     echo "Output of $3:"
     echo "${SEP}"
-    echo -E "${output_b}"
+    cat out_b.txt
     echo "${SEP}"
     exit
   fi
