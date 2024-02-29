@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
 all: debugger.sh.base64 debugger.sh.sha1sum
-.PHONY: run test clean
+.PHONY: all run test clean
 
 debugger.sh:
 debugger.sh.base64: debugger.sh
