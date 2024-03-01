@@ -3,7 +3,6 @@ SHELL=/bin/bash
 all: debugger.sh.base64 debugger.sh.sha1sum
 .PHONY: all run test clean
 
-debugger.sh:
 debugger.sh.base64: debugger.sh
 	base64 debugger.sh | tee debugger.sh.base64
 debugger.sh.sha1sum: debugger.sh
