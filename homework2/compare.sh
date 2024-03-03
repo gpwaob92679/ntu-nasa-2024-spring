@@ -4,6 +4,7 @@
 LANG="C.UTF-8"
 LC_ALL="C.UTF-8"
 
+# Global variables for parsed arguments.
 HIDDEN=
 SYMLINK=
 REGEX=
@@ -11,13 +12,16 @@ RECURSIVE=
 PATH_A=
 PATH_B=
 
+# Helper function to print debug messages.
 err() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*" >&2
 }
 
-# Prints usage mssage and exit.
+# Print usage mssage and exit.
 # Arguments:
 #   None
+# Outputs:
+#   Usage message.
 usage() {
   cat <<END
 usage: ./compare.sh [OPTION] <PATH A> <PATH B>
@@ -80,7 +84,7 @@ check_exist() {
     if [[ -z "${SYMLINK}" ]]; then
       return 1
     fi
-  elif ! [[ -e  "$1" ]]; then
+  elif ! [[ -e "$1" ]]; then
     return 1
   fi
   return 0
@@ -153,9 +157,9 @@ compare_files() {
 
   diff_output_tail="$(tail -n +3 <(echo -E "${diff_output}"))"  # Remove header
   local -i delete_count
-  delete_count="$(echo -E "${diff_output_tail}" |  grep -c ^-)"
+  delete_count="$(echo -E "${diff_output_tail}" | grep -c ^-)"
   local -i insert_count
-  insert_count="$(echo -E "${diff_output_tail}" |  grep -c ^+)"
+  insert_count="$(echo -E "${diff_output_tail}" | grep -c ^+)"
   # Can't use `wc -l` because it doesn't account for the last line if there is
   # no newline at end of file.
   local -i keep_count=$(( "$(awk 'END {print NR}' "$1")" - delete_count ))
@@ -188,7 +192,9 @@ compare_symlinks() {
 # Arguments:
 #   Paths to compare.
 # Outputs:
-#   See `compare_files()` and `compare_symlinks()`.
+#   If one regular file and one symlink, output "changed 100%".
+#   If two files are the same type, see `compare_files()` and
+#   `compare_symlinks()`.
 # Returns:
 #   0 and 1, same as `compare_files()` and `compare_symlinks()`.
 #   2 if arguments contain one or more symbolic links but `-l` is off.
@@ -200,7 +206,7 @@ compare_files_or_symlinks() {
     if [[ -L "$1" ]] && [[ -L "$2" ]]; then
       compare_symlinks "$1" "$2"
       return $?
-    else  # One regular file and one symlink.
+    else
       echo "changed 100%"
       return 1
     fi
@@ -219,6 +225,8 @@ compare_files_or_symlinks() {
 # Outputs:
 #   If both files exist, output individual file paths followed by output of
 #   `compare_files()`.
+#   If file exists under PATH_A but not PATH_B, output "create FILE".
+#   If file exists under PATH_B but not PATH_A, output "delete FILE".
 compare_directories() {
   local -a temp
   for f in "$1"/*; do
@@ -227,7 +235,6 @@ compare_directories() {
   for f in "$2"/*; do
     temp+=("${f#"$2"/}")
   done
-  for f in "${temp[@]}"; do echo "${f}"; done | uniq > test.txt
   readarray -t files < \
       <(for f in "${temp[@]}"; do echo "${f}"; done | sort | uniq)
   # err "${files[@]}"
