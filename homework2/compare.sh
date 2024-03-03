@@ -54,6 +54,24 @@ parse_optional_args() {
   return $(( OPTIND - 1 ))
 }
 
+# Check if file exists. If file is a symbolic link and `-l` is not on, the
+# file is regarded non-existent.
+# Globals:
+#   SYMLINK
+# Arugments:
+#   A file path to be checked.
+# Returns:
+#  0 if file exists, 1 otherwise.
+check_exist() {
+  if [[ -L "$1" ]]; then
+    if [[ -z "${SYMLINK}" ]]; then
+      usage
+    fi
+  elif ! [[ -e  "$1" ]]; then
+    usage
+  fi
+}
+
 # Verify arguments.
 # Globals:
 #   HIDDEN
@@ -70,7 +88,7 @@ verify_args() {
   if (( $# != 2 )); then
     usage
   fi
-  if ! [[ -e "$1" ]] || ! [[ -e "$2" ]]; then
+  if ! check_exist "$1" || ! check_exist "$2"; then
     usage
   fi
 
@@ -85,6 +103,19 @@ verify_args() {
   fi
 }
 
+# Return the greater of two integers.
+# Arguments:
+#  Two integers.
+# Outputs:
+#  The greater of the two integers.
+max() {
+  if (( "$1" > "$2" )); then
+    echo "$1"
+  else
+    echo "$2"
+  fi
+}
+
 main() {
   err "args:" "$@"
   parse_optional_args "$@"
@@ -92,6 +123,31 @@ main() {
   err "HIDDEN=${HIDDEN}, SYMLINK=${SYMLINK}, REGEX=${REGEX}, RECURSIVE=${RECURSIVE}"
   err "positional args:" "$@"
   verify_args "$@"
+
+  local diff_output
+  # -U 0 is necessary for line calculations below to work.
+  if diff_output="$(diff -d -U 0 "$1" "$2")"; then
+    # No differences.
+    exit
+  fi
+
+  if grep binary <(echo -E "${diff_output}"); then
+    echo "changed 100%"
+  fi
+
+  diff_output_tail="$(tail -n +3 <(echo -E "${diff_output}"))"  # Remove header
+  local -i delete_count
+  delete_count="$(echo -E "${diff_output_tail}" |  grep -c ^-)"
+  local -i insert_count
+  insert_count="$(echo -E "${diff_output_tail}" |  grep -c ^+)"
+  # Can't use `wc -l` because it doesn't account for the last line if there is
+  # no newline at end of file.
+  local -i keep_count=$(( "$(awk 'END {print NR}' "$1")" - delete_count ))
+  err "${delete_count} ${insert_count} ${keep_count}"
+
+  local -i mx
+  mx="$(max "${delete_count}" "${insert_count}")"
+  echo "changed $(( 100 * mx / $(( mx + keep_count )) ))%"
 }
 
 main "$@"
