@@ -27,17 +27,17 @@ END
   exit
 }
 
-# Parse optional arguments.
+# Parse and verify arguments.
 # Globals:
 #   HIDDEN
 #   SYMLINK
 #   REGEX
 #   RECURSIVE
+#   PATH_A
+#   PATH_B
 # Arguments:
 #   All arguments that the script is run with.
-# Returns:
-#   Index of the first position argument.
-parse_optional_args() {
+parse_args() {
   while getopts ":ahln:r" opt; do
     case "${opt}" in
       a) HIDDEN="true" ;;
@@ -57,7 +57,7 @@ parse_optional_args() {
   PATH_A="$1"
   PATH_B="$2"
   readonly PATH_A PATH_B
-  return $(( OPTIND - 1 ))
+  verify_args "$@"
 }
 
 # Check if file exists. If file is a symbolic link and `-l` is not on, the
@@ -226,16 +226,14 @@ compare_directories() {
 
 main() {
   err "args:" "$@"
-  parse_optional_args "$@"
-  shift $?
-  err "HIDDEN=${HIDDEN}, SYMLINK=${SYMLINK}, REGEX=${REGEX}, RECURSIVE=${RECURSIVE}"
-  err "positional args:" "$@"
-  verify_args "$@"
+  parse_args "$@"
+  err "HIDDEN=${HIDDEN},SYMLINK=${SYMLINK},REGEX=${REGEX},RECURSIVE=${RECURSIVE}"
+  err "PATH_A=${PATH_A},PATH_B=${PATH_B}"
 
   if [[ -n "${RECURSIVE}" ]]; then
-    compare_directories "$1" "$2"
+    compare_directories "${PATH_A}" "${PATH_B}"
   else
-    compare_files "$1" "$2"
+    compare_files "${PATH_A}" "${PATH_B}"
   fi
 }
 
