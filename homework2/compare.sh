@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Ensure `sort` sorts in ASCII order.
+LANG="C.UTF-8"
+LC_ALL="C.UTF-8"
+
 HIDDEN=
 SYMLINK=
 REGEX=
