@@ -15,3 +15,4 @@ if [[ -d link3 ]]; then rm -r link3; fi
 ln -s code/helloworld.cpp link1
 ln -s .code.backup link2
 ln -s link2 link3
+cp hello.txt link4

@@ -1,4 +1,0 @@
-.code.backup/output2.txt: changed 40%
-code/output2.txt: changed 40%
-delete hello.txt
-create hi.txt

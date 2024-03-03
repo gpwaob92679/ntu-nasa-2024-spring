@@ -9,4 +9,10 @@ int main(){
 	out.open("output2.txt");
 	out<<"hi\nworld\nand\nkitty\n";
 	out.close();
+	out.open("output3.txt");
+	out<<"hi\nworld\nand\nkitty\n";
+	out.close();
+	out.open("output4.txt");
+	out<<"hi\nworld\nand\nkitty";
+	out.close();
 }
