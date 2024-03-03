@@ -40,7 +40,10 @@ END
 parse_args() {
   while getopts ":ahln:r" opt; do
     case "${opt}" in
-      a) HIDDEN="true" ;;
+      a)
+        HIDDEN="true"
+        shopt -s dotglob
+        ;;
       l) SYMLINK="true" ;;
       n)
         if [[ "${OPTARG:0:1}" = "-" ]]; then
@@ -128,7 +131,7 @@ max() {
 #   Paths of two files to compare.
 # Outputs:
 #   Nothing if files are identical, "changed X%" if files differ, where X is
-#   calculated according to the problem spec.
+#   calculated according to the problem specification.
 # Returns:
 #   0 if files are identical, 1 if files differ.
 compare_files() {
@@ -164,14 +167,43 @@ compare_files() {
 # Arguments:
 #   Paths of two symbolic links to compare.
 # Outputs:
-#   Nothing if symbolic links are identical, "changed 100%" otherwise.
+#   Nothing if symbolic links point to the same path, "changed 100%" if one
+#   symbolic links point to different paths.
 # Returns:
 #   0 if symbolic links point to the same path, 1 otherwise.
 compare_symlinks() {
-  if ! diff "$(readlink "$1")" "$(readlink   "$2")"; then
+  if ! diff <(echo -E "$(readlink "$1")") <(echo -E "$(readlink "$2")") \
+      > /dev/null; then
     echo "changed 100%"
+    return 1
   fi
   return 0
+}
+
+# Compare two files or symbolic links. Dispatch comparison to `compare_files()`
+# or `compare_symlinks()` based on type.
+# Arguments:
+#   Paths to compare.
+# Outputs:
+#   See `compare_files()` and `compare_symlinks()`.
+# Returns:
+#   See `compare_files()` and `compare_symlinks()`. 2 if arguments contain
+#   one or more symbolic links but `-l` is off.
+compare_files_or_symlinks() {
+  if [[ -L "$1" ]] || [[ -L "$2" ]]; then
+    if [[ -z "${SYMLINK}" ]]; then
+      return 2
+    fi
+    if [[ -L "$1" ]] && [[ -L "$2" ]]; then
+      compare_symlinks "$1" "$2"
+      return $?
+    else  # One regular file and one symlink.
+      echo "changed 100%"
+      return 1
+    fi
+  fi
+  # Two regular files.
+  compare_files "$1" "$2"
 }
 
 # Recursively compare two directories.
@@ -197,30 +229,31 @@ compare_directories() {
   err "${files[@]}"
 
   for f in "${files[@]}"; do
-    if [[ -d "$1/${f}" ]] && [[ -d "$2/${f}" ]]; then
+    if ! [[ -L "$1/${f}" ]] && [[ -d "$1/${f}" ]] && ! [[ -L "$2/${f}" ]] \
+       && [[ -d "$2/${f}" ]]; then
       compare_directories "$1/${f}" "$2/${f}"
-    else
-      output_path="$1/${f}"
-      output_path="${output_path#"${PATH_A}/"}"
-      output_path="${output_path#"${PATH_B}/"}"
-      err "output_path=${output_path}"
-      if [[ -L "$1/${f}" ]] && [[ -z "${SYMLINK}" ]]; then
-        continue
-      elif ! check_exist "$1/${f}" \
-           && check_exist "$2/${f}"; then
-        echo "create ${output_path}"
-        continue
-      elif check_exist "$1/${f}" \
-           && ! check_exist "$2/${f}"; then
-        echo "delete ${output_path}"
-        continue
-      fi
+      continue
+    fi
 
-      local compare_output
-      compare_output="$(compare_files "$1/${f}" "$2/${f}")"
-      if (( $? == 1 )); then
-        echo "${output_path}: ${compare_output}"
-      fi
+    output_path="$1/${f}"
+    output_path="${output_path#"${PATH_A}/"}"
+    output_path="${output_path#"${PATH_B}/"}"
+    err "output_path=${output_path}"
+    if ! check_exist "$1/${f}" \
+       && check_exist "$2/${f}"; then
+      echo "create ${output_path}"
+      continue
+    fi
+    if check_exist "$1/${f}" \
+       && ! check_exist "$2/${f}"; then
+      echo "delete ${output_path}"
+      continue
+    fi
+
+    local compare_output
+    compare_output="$(compare_files_or_symlinks "$1/${f}" "$2/${f}")"
+    if (( $? == 1 )); then
+      echo "${output_path}: ${compare_output}"
     fi
   done
 }
@@ -234,7 +267,7 @@ main() {
   if [[ -n "${RECURSIVE}" ]]; then
     compare_directories "${PATH_A}" "${PATH_B}"
   else
-    compare_files "${PATH_A}" "${PATH_B}"
+    compare_files_or_symlinks "${PATH_A}" "${PATH_B}"
   fi
 }
 
