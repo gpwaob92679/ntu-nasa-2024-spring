@@ -81,8 +81,8 @@ check_exist() {
 # Arguments:
 #   Positional arguments after parsing.
 verify_args() {
-  if { [[ -z "${HIDDEN}" ]] || [[ -z "${REGEX}" ]]; } \
-    && [[ -n "${RECURSIVE}" ]]; then
+  if { [[ -n "${HIDDEN}" ]] || [[ -n "${REGEX}" ]]; } \
+    && [[ -z "${RECURSIVE}" ]]; then
     usage
   fi
   if (( $# != 2 )); then
