@@ -155,7 +155,6 @@ compare_files() {
   # Can't use `wc -l` because it doesn't account for the last line if there is
   # no newline at end of file.
   local -i keep_count=$(( "$(awk 'END {print NR}' "$1")" - delete_count ))
-  err "${delete_count} ${insert_count} ${keep_count}"
 
   local -i mx
   mx="$(max "${delete_count}" "${insert_count}")"
@@ -187,8 +186,8 @@ compare_symlinks() {
 # Outputs:
 #   See `compare_files()` and `compare_symlinks()`.
 # Returns:
-#   See `compare_files()` and `compare_symlinks()`. 2 if arguments contain
-#   one or more symbolic links but `-l` is off.
+#   0 and 1, same as `compare_files()` and `compare_symlinks()`.
+#   2 if arguments contain one or more symbolic links but `-l` is off.
 compare_files_or_symlinks() {
   if [[ -L "$1" ]] || [[ -L "$2" ]]; then
     if [[ -z "${SYMLINK}" ]]; then
@@ -210,6 +209,7 @@ compare_files_or_symlinks() {
 # Arguments:
 #   Paths of two directories to compare.
 # Globals:
+#   REGEX
 #   PATH_A
 #   PATH_B
 # Outputs:
@@ -226,7 +226,7 @@ compare_directories() {
   for f in "${temp[@]}"; do echo "${f}"; done | uniq > test.txt
   readarray -t files < \
       <(for f in "${temp[@]}"; do echo "${f}"; done | sort | uniq)
-  err "${files[@]}"
+  # err "${files[@]}"
 
   for f in "${files[@]}"; do
     if ! [[ -L "$1/${f}" ]] && [[ -d "$1/${f}" ]] && ! [[ -L "$2/${f}" ]] \
@@ -242,7 +242,7 @@ compare_directories() {
     output_path="$1/${f}"
     output_path="${output_path#"${PATH_A}/"}"
     output_path="${output_path#"${PATH_B}/"}"
-    err "output_path=${output_path}"
+
     if ! check_exist "$1/${f}" \
        && check_exist "$2/${f}"; then
       echo "create ${output_path}"
@@ -263,10 +263,10 @@ compare_directories() {
 }
 
 main() {
-  err "args:" "$@"
+  # err "args:" "$@"
   parse_args "$@"
-  err "HIDDEN=${HIDDEN},SYMLINK=${SYMLINK},REGEX=${REGEX},RECURSIVE=${RECURSIVE}"
-  err "PATH_A=${PATH_A},PATH_B=${PATH_B}"
+  # err "HIDDEN=${HIDDEN},SYMLINK=${SYMLINK},REGEX=${REGEX},RECURSIVE=${RECURSIVE}"
+  # err "PATH_A=${PATH_A},PATH_B=${PATH_B}"
 
   if [[ -n "${RECURSIVE}" ]]; then
     compare_directories "${PATH_A}" "${PATH_B}"
