@@ -235,6 +235,10 @@ compare_directories() {
       continue
     fi
 
+    if [[ -n "${REGEX}" ]] && ! [[ "${f}" =~ ${REGEX} ]]; then
+      continue
+    fi
+
     output_path="$1/${f}"
     output_path="${output_path#"${PATH_A}/"}"
     output_path="${output_path#"${PATH_B}/"}"
