@@ -112,9 +112,9 @@ verify_args() {
 
 # Return the greater of two integers.
 # Arguments:
-#  Two integers.
+#   Two integers.
 # Outputs:
-#  The greater of the two integers.
+#   The greater of the two integers.
 max() {
   if (( "$1" > "$2" )); then
     echo "$1"
@@ -133,7 +133,7 @@ max() {
 #   0 if files are identical, 1 if files differ.
 compare_files() {
   local diff_output
-  # -U 0 is necessary for line calculations below to work.
+  # `-U 0` is necessary for line calculations below to work.
   if diff_output="$(diff -d -U 0 "$1" "$2")"; then
     # No differences.
     return 0
@@ -177,12 +177,13 @@ compare_symlinks() {
 # Recursively compare two directories.
 # Arguments:
 #   Paths of two directories to compare.
+# Globals:
+#   PATH_A
+#   PATH_B
 # Outputs:
 #   If both files exist, output individual file paths followed by output of
 #   `compare_files()`.
 compare_directories() {
-  # Unique elements in array.
-  # Reference: https://stackoverflow.com/a/13649357
   local -a temp
   for f in "$1"/*; do
     temp+=("${f#"$1"/}")
