@@ -90,7 +90,7 @@ check_exist() {
   return 0
 }
 
-# Verify arguments.
+# Verify parsed arguments.
 # Globals:
 #   HIDDEN
 #   SYMLINK
@@ -111,11 +111,13 @@ verify_args() {
   fi
 
   if [[ -n "${RECURSIVE}" ]]; then
-    if ! [[ -d "$1" ]] || ! [[ -d "$2" ]]; then
+    if [[ -L "$1" ]] || ! [[ -d "$1" ]] \
+       || [[ -L "$2" ]] || ! [[ -d "$2" ]]; then
       usage
     fi
   else
-    if [[ -d "$1" ]] || [[ -d "$2" ]]; then
+    if { ! [[ -L "$1" ]] && [[ -d "$1" ]]; } || \
+       { ! [[ -L "$2" ]] && [[ -d "$2" ]]; }; then
       usage
     fi
   fi
