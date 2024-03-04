@@ -12,12 +12,12 @@ RECURSIVE=
 PATH_A=
 PATH_B=
 
-# Helper function to print debug messages.
+# Print debug messages to STDERR.
 err() {
   echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*" >&2
 }
 
-# Print usage mssage and exit.
+# Print usage message and exit.
 # Arguments:
 #   None
 # Outputs:
@@ -131,7 +131,7 @@ max() {
   fi
 }
 
-# Compare two files.
+# Compare two regular files.
 # Arguments:
 #   Paths of two files to compare.
 # Outputs:
@@ -171,8 +171,8 @@ compare_files() {
 # Arguments:
 #   Paths of two symbolic links to compare.
 # Outputs:
-#   Nothing if symbolic links point to the same path, "changed 100%" if one
-#   symbolic links point to different paths.
+#   Nothing if symbolic links point to the same path, "changed 100%" if they
+#   point to different paths.
 # Returns:
 #   0 if symbolic links point to the same path, 1 otherwise.
 compare_symlinks() {
@@ -187,7 +187,7 @@ compare_symlinks() {
 # Compare two files or symbolic links. Dispatch comparison to `compare_files()`
 # or `compare_symlinks()` based on type.
 # Arguments:
-#   Paths to compare.
+#   Paths of two files to compare.
 # Outputs:
 #   If one regular file and one symlink, output "changed 100%".
 #   If two files are the same type, see `compare_files()` and
@@ -212,7 +212,8 @@ compare_files_or_symlinks() {
   compare_files "$1" "$2"
 }
 
-# Recursively compare two directories.
+# Recursively compare two directories. Performs regex filtering if `-n <EXP>`
+# is given.
 # Arguments:
 #   Paths of two directories to compare.
 # Globals:
@@ -247,7 +248,7 @@ compare_directories() {
       continue
     fi
 
-    output_path="$1/${f}"
+    local output_path="$1/${f}"
     output_path="${output_path#"${PATH_A}/"}"
     output_path="${output_path#"${PATH_B}/"}"
 
