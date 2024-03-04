@@ -1,0 +1,112 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[left=2cm, right=2cm, top=2cm, bottom=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage[colorlinks, urlcolor=blue]{hyperref}
+\usepackage{xeCJK}
+
+\setCJKmainfont{新細明體}
+
+\title{
+  Network Administration/System Administration\\
+  (NTU CSIE, Spring 2024)\\
+  Homework \#2
+}
+\author{\Large B12902110 呂承諺}
+
+\begin{document}
+  \maketitle
+  \section*{Code Explanation}
+  I finished all 5 subtasks of this project. Below are descriptions of
+  every function throughout the script.
+  \begin{itemize}
+    \item \textbf{\texttt{err}}: Print debug messages to STDERR.
+    \item \textbf{\texttt{usage}}: Print usage message and exit.
+    \item \textbf{\texttt{parse\_args}}: Parse arguments and save them into
+      corresponding global variables. If unknown options are met, call
+      \texttt{usage} immediately. Call \verb|verify_args| after parsing to
+      verify them.
+    \item \textbf{\texttt{check\_exist}}: Check if the given file exists. If the
+      file is a symbolic link and \texttt{-l} is not on, its regarded
+      non-existent.
+    \item \textbf{\texttt{verify\_args}}: Verify parsed arguments. This includes
+      checking:
+      \begin{itemize}
+        \item \texttt{-r} should be on if \texttt{-a} or \texttt{-n} is on.
+        \item There should be exactly 2 positional arguments.
+        \item Both \texttt{<PATH A>} and \texttt{<PATH B>} exists.
+        \item \texttt{<PATH A>} and \texttt{<PATH B>} should be both directories
+          if \texttt{-r} is on, and both should not be directories otherwise.
+      \end{itemize}
+    \item \textbf{\texttt{max}}: Return the greater of two integers.
+    \item \textbf{\texttt{compare\_files}}: Compare two regular files. Outputs
+      nothing if files are identical, \texttt{changed X\%} if files differ, where
+      \texttt{X} is calculated according to the problem specification. Tools
+      \texttt{grep}, \texttt{tail}, and \texttt{awk} are used to process the
+      output of \texttt{diff} and calculate the number of lines deleted and
+      inserted.
+    \item \textbf{\texttt{compare\_symlinks}}: Compare paths pointed by two
+      symbolic links. Outputs nothing if symbolic links point to the same path,
+      \texttt{changed 100\%} if they point to different paths. We compare the
+      outputs of \texttt{readlink}.
+    \item \textbf{\texttt{compare\_files\_or\_symlinks}}: Compare two files or
+      symbolic links. Dispatch comparison to \verb|compare_files| or
+      \verb|compare_symlinks| based on type. Outputs \texttt{changed 100\%} if
+      comparing one regular file and one symbolic link.
+    \item \textbf{\texttt{compare\_directories}}: Recursively compare two
+      directories. Performs regex filtering if \texttt{-n <EXP>} is given.
+    \item \textbf{\texttt{main}}: Entry point of the script.
+  \end{itemize}
+
+  \section*{References}
+  Listed below are all references that I've consulted for each subtask.
+  \section{參數檢查}
+  \begin{itemize}
+    \item \href{https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html}{Bourne Shell Builtins (Bash Reference Manual)}
+    \item \href{https://stackoverflow.com/questions/16483119/an-example-of-how-to-use-getopts-in-bash}{shell - An example of how to use getopts in bash - Stack Overflow}
+    \item \href{https://www.gnu.org/software/bash/manual/html_node/Conditional-Constructs.html}{Conditional Constructs (Bash Reference Manual)}
+    \item \href{https://www.gnu.org/software/bash/manual/html_node/Bash-Conditional-Expressions.html}{Bash Conditional Expressions (Bash Reference Manual)}
+    \item \href{https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html}{Shell Parameter Expansion (Bash Reference Manual)}
+  \end{itemize}
+
+  \section{比較檔案}
+  \begin{itemize}
+    \item \href{https://unix.stackexchange.com/questions/81998/understanding-of-diff-output}{linux - Understanding of diff output - Unix \& Linux Stack Exchange}
+    \item \href{https://www.gnu.org/software/bash/manual/html_node/Arithmetic-Expansion.html}{Arithmetic Expansion (Bash Reference Manual)}
+    \item \href{https://www.shellcheck.net/wiki/SC2207}{ShellCheck: SC2207 – Prefer `mapfile` or `read -a` to split command output (or quote to avoid splitting).}
+    \item \href{https://www.gnu.org/software/bash/manual/html_node/Shell-Arithmetic.html}{Shell Arithmetic (Bash Reference Manual)}
+    \item \href{https://www.gnu.org/software/diffutils/manual/html_node/Detailed-Unified.html}{Detailed Unified (Comparing and Merging Files)}
+    \item \href{https://unix.stackexchange.com/questions/362278/how-to-use-awk-to-count-the-total-number-of-input-lines-in-a-file}{How to use awk to count the total number of input lines in a file? - Unix \& Linux Stack Exchange}
+    \item \verb|man grep|, \verb|man diff|, \verb|man wc|, and \verb|man awk|
+    \item Discussions on NTU COOL about cases where there's no newline at end of
+      file.
+  \end{itemize}
+
+  \section{比較目錄}
+  \begin{itemize}
+    \item \href{https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html}{Shell Parameter Expansion (Bash Reference Manual)}
+    \item \href{https://stackoverflow.com/questions/7442417/how-to-sort-an-array-in-bash}{How to sort an array in Bash - Stack Overflow}
+    \item \verb|man uniq|, \verb|man sort|, and \verb|man locale.7|
+    \item Discussions on NTU COOL about cases where \texttt{<PATH A>} or
+      \texttt{<PATH B>} is hidden.
+  \end{itemize}
+
+  \section{隱藏的檔案與Symlink}
+  \begin{itemize}
+    \item \href{https://askubuntu.com/questions/829796/how-should-i-glob-for-all-hidden-files}{command line - How should I glob for all hidden files? - Ask Ubuntu}
+    \item \href{https://www.gnu.org/software/bash/manual/html_node/The-Shopt-Builtin.html}{The Shopt Builtin (Bash Reference Manual)}
+    \item \href{https://www.gnu.org/software/bash/manual/html_node/Bash-Conditional-Expressions.html}{Bash Conditional Expressions (Bash Reference Manual)}
+    \item \verb|man readlink|
+    \item Discussions on NTU COOL about the correct behavior of ignoring
+      symbolic links if \texttt{-l} is not given.
+    \item Discussions on NTU COOL about the sorting result when running the
+      script on workstations.
+  \end{itemize}
+
+  \section{僅比較特定的檔案}
+  \begin{itemize}
+    \item \href{https://en.wikibooks.org/wiki/Regular_Expressions/POSIX-Extended_Regular_Expressions}{Regular Expressions/POSIX-Extended Regular Expressions - Wikibooks, open books for an open world}
+    \item \href{https://www.gnu.org/software/bash/manual/html_node/Conditional-Constructs.html}{Conditional Constructs (Bash Reference Manual)}
+    \item Discussions on NTU COOL about how to treat option-like regular
+      expressions.
+  \end{itemize}
+\end{document}
