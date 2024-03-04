@@ -53,12 +53,7 @@ parse_args() {
         shopt -s dotglob
         ;;
       l) SYMLINK="true" ;;
-      n)
-        if [[ "${OPTARG:0:1}" = "-" ]]; then
-          usage
-        fi
-        REGEX="${OPTARG}"
-        ;;
+      n) REGEX="${OPTARG}" ;;
       r) RECURSIVE="true";;
       h | *) usage ;;
     esac
