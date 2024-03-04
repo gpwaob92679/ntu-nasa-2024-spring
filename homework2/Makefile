@@ -10,6 +10,13 @@ check: $(test_files)
 
 .PHONY: check clean gen_test clean_test
 
+b12902110.zip: compare.sh report.pdf
+	if ! [[ -e b12902110 ]]; then mkdir b12902110; fi
+	cp compare.sh b12902110
+	cp report.pdf b12902110
+	zip -r b12902110.zip b12902110
+	rm -rf b12902110
+
 clean: clean_test
 	rm -rf output
 
