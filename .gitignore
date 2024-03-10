@@ -302,5 +302,21 @@ TSWLatexianTemp*
 #*Notes.bib
 
 ###
-nasa2024-hw0-sa-release
 desktop.ini
+*.xlsx
+references.txt
+
+nasa2024-hw0-sa-release
+
+lab2/a
+lab2/b
+lab2/gen
+lab2/in.txt
+lab2/out_a.txt
+lab2/out_b.txt
+lab2/debugger.sh.base64
+lab2/debugger.sh.sha1sum
+
+homework2/dir[1-2]
+homework2/output
+homework2/b12902110.zip

@@ -1,3 +1,4 @@
 *.sh eol=lf
 Makefile eol=lf
-expected.txt eol=lf
+lab2/expected.txt eol=lf
+homework2/sample_output/*.txt eol=lf
