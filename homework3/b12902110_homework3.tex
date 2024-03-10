@@ -99,8 +99,8 @@ cryptsetup open /dev/vda2 cryptboot\end{verbatim}
     \item Generate a random 256-bit key, and add it as a key of
     \verb|/dev/mapper/cryptboot|:
     \begin{verbatim}
-dd if=/dev/random of=b12902110.key bs=256 count=1|
-cryptsetup luksAddKey /dev/vda2 /root/password\end{verbatim}
+dd if=/dev/random of=b12902110.key bs=256 count=1
+cryptsetup luksAddKey /dev/vda2 b12902110.key\end{verbatim}
     \item Encrypt \verb|/dev/md/linux| and map it to \verb|/dev/mapper/cryptroot|:
     \begin{verbatim}
 cryptsetup luksFormat --type luks2 /dev/md/linux b12902110.key
