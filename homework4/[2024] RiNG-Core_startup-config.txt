@@ -1,0 +1,144 @@
+!
+version 15.0
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname RiNG-Core
+!
+enable secret 5 $1$mERr$xOBRtHD8zJf.94CGVuvjw/
+!
+!
+!
+!
+username RiNG privilege 15 password 7 0813435D0C150C16
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+interface Port-channel1
+ description to RiNG-Edge
+ switchport trunk allowed vlan 10,99
+ switchport mode trunk
+!
+interface FastEthernet0/1
+ description to PC01
+ switchport access vlan 10
+ switchport mode access
+!
+interface FastEthernet0/2
+ description to PC02
+ switchport access vlan 10
+ switchport mode access
+!
+interface FastEthernet0/3
+ description to PC03
+ switchport access vlan 10
+ switchport mode access
+!
+interface FastEthernet0/4
+ shutdown
+!
+interface FastEthernet0/5
+ shutdown
+!
+interface FastEthernet0/6
+ shutdown
+!
+interface FastEthernet0/7
+ shutdown
+!
+interface FastEthernet0/8
+ shutdown
+!
+interface FastEthernet0/9
+ shutdown
+!
+interface FastEthernet0/10
+ shutdown
+!
+interface FastEthernet0/11
+ description to PC11
+ switchport access vlan 10
+ switchport mode access
+!
+interface FastEthernet0/12
+ description to PC12
+ switchport access vlan 10
+ switchport mode access
+!
+interface FastEthernet0/13
+ shutdown
+!
+interface FastEthernet0/14
+ shutdown
+!
+interface FastEthernet0/15
+ shutdown
+!
+interface FastEthernet0/16
+ shutdown
+!
+interface FastEthernet0/17
+ shutdown
+!
+interface FastEthernet0/18
+ shutdown
+!
+interface FastEthernet0/19
+ shutdown
+!
+interface FastEthernet0/20
+ shutdown
+!
+interface FastEthernet0/21
+ shutdown
+!
+interface FastEthernet0/22
+ shutdown
+!
+interface FastEthernet0/23
+ shutdown
+!
+interface FastEthernet0/24
+ description Admin
+ switchport access vlan 99
+ switchport mode access
+!
+interface GigabitEthernet0/1
+ description to RiNG-Edge(1)
+ switchport trunk allowed vlan 10,99
+ switchport mode trunk
+ channel-group 1 mode active
+!
+interface GigabitEthernet0/2
+ description to RiNG-Edge(2)
+ switchport trunk allowed vlan 10,99
+ switchport mode trunk
+ channel-group 1 mode active
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan99
+ ip address 192.168.99.1 255.255.255.0
+!
+!
+!
+!
+line con 0
+ login local
+!
+line vty 0 4
+ login
+line vty 5 15
+ login
+!
+!
+!
+!
+end
+
