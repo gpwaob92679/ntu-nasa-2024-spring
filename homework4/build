@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rm -rf b12902110 b12902110.zip
+mkdir b12902110
+cp "[2024] haruhikage.pka" b12902110/haruhikage.pka
+cp "[2024] noroshi.pka" b12902110/noroshi.pka
+zip -r b12902110.zip b12902110
+rm -rf b12902110
