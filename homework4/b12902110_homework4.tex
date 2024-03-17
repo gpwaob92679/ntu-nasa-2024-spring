@@ -21,41 +21,41 @@
   \maketitle
   \section*{Chapter1: 迷星叫}
   \begin{enumerate}
-     \item\phantom{}\vspace{-\baselineskip}
+    \item\phantom{}\vspace{-\baselineskip}
 
-     \begin{tabular}{|c|c|c|}
-       \hline
-       & 可通過的VLAN 數量 & 802.1Q 標記 \\\hline
-       Access Port & 1 & No \\\hline
-       Trunk Port & All in the allowlist & Yes, except for its native VLAN \\\hline
-     \end{tabular}
+    \begin{tabular}{|c|c|c|}
+     \hline
+     & 可通過的VLAN 數量 & 802.1Q 標記 \\\hline
+     Access Port & 1 & No \\\hline
+     Trunk Port & Many, all in the allowlist & Yes, except for its native VLAN \\\hline
+    \end{tabular}
 
-     \item The trunk native VLAN is the VLAN that carries untagged traffic on a
-     trunk port. On the transmitting side, packets with the same VLAN ID as the
-     trunk native VLAN will be sent untagged. On the receiving side, untagged
-     packets are assumed to be in the native VLAN.
+    \item The trunk native VLAN is the VLAN that carries untagged traffic on a
+    trunk port. On the transmitting side, packets with the same VLAN ID as the
+    trunk native VLAN will be sent untagged. On the receiving side, untagged
+    packets are assumed to be in the native VLAN.
 
-     \item\phantom{}\vspace{-\baselineskip}
+    \item\phantom{}\vspace{-\baselineskip}
 
-     \begin{tabular}{|c|c|c|c|c|c|c|}
-       \hline
-       \multicolumn{7}{|c|}{封包}\\\hline
-       & \multicolumn{5}{c|}{802.1Q VID 欄位} & \\\hline
-       傳遞方向 & 線路1 & 線路2 & 線路3 & 線路4 & 線路5 & 能否抵達 \\\hline
-       PC-01/VLAN 10 → PC-02 & 10 & 無 & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & 可 \\\hline
-       PC-01/VLAN 20 → PC-02 & 10 & X & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & 否 \\\hline
-       PC-01/VLAN 10 → PC-04 & 10 & \cellcolor{gray} & X & \cellcolor{gray} & X & 否\\\hline
-       PC-01/VLAN 20 → PC-04 & 20 & \cellcolor{gray} & 20 & \cellcolor{gray} & 20 & 可\\\hline
-       PC-01/VLAN 10 → PC-03 & 10 & \cellcolor{gray} & \cellcolor{gray} & 10 & \cellcolor{gray} & 可 \\\hline
-       PC-01/VLAN 20 → PC-03 & 20 & \cellcolor{gray} & \cellcolor{gray} & 20 & \cellcolor{gray} & 可 \\\hline
-     \end{tabular}
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline
+      \multicolumn{7}{|c|}{封包} \\\hline
+      & \multicolumn{5}{c|}{802.1Q VID 欄位} & \\\hline
+      傳遞方向 & 線路1 & 線路2 & 線路3 & 線路4 & 線路5 & 能否抵達 \\\hline
+      PC-01/VLAN 10 → PC-02 & 10 & 無 & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & 可 \\\hline
+      PC-01/VLAN 20 → PC-02 & 10 & X & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & 否 \\\hline
+      PC-01/VLAN 10 → PC-04 & 10 & \cellcolor{gray} & 無 & \cellcolor{gray} & X & 否\\\hline
+      PC-01/VLAN 20 → PC-04 & 20 & \cellcolor{gray} & 20 & \cellcolor{gray} & 20 & 可\\\hline
+      PC-01/VLAN 10 → PC-03 & 10 & \cellcolor{gray} & \cellcolor{gray} & 10 & \cellcolor{gray} & 可 \\\hline
+      PC-01/VLAN 20 → PC-03 & 20 & \cellcolor{gray} & \cellcolor{gray} & 20 & \cellcolor{gray} & 可 \\\hline
+    \end{tabular}
 
-     \item Suppose the packet has two VLAN tags, the first one with VLAN ID 10
-     and the second one with VLAN ID 20. When Switch-01 forwards this packet to
-     Switch-02 via link 3, it drops the first tag because VLAN 10 is the
-     native VLAN for this trunk port. Now when Switch-02 receives the frame, it
-     sees the tag with VLAN ID 20 and allows it to flow on link 5, eventually
-     reaching PC-04.
+    \item Suppose the packet has two VLAN tags, the first one with VLAN ID 10
+    and the second one with VLAN ID 20. When Switch-01 forwards this packet to
+    Switch-02 via link 3, it drops the first tag because VLAN 10 is the native
+    VLAN for this trunk port. Now when Switch-02 receives the frame, it sees the
+    tag with VLAN ID 20 and allows it to flow on link 5, eventually reaching
+    PC-04.
   \end{enumerate}
 
   \paragraph{References}
@@ -198,7 +198,7 @@ RiNG-Core(config)#ip ssh version 2
       In this example, that is 192.168.79.232。
 
       \item \textbf{Acknowledgement:} The server sends a DHCPACK message to
-      the client and completes the setup.
+      the client. This completes the setup.
 
       \includegraphics[width=0.8\textwidth]{wireshark_dhcp_ack.png}
     \end{itemize}
@@ -216,7 +216,7 @@ RiNG-Core(config)#ip ssh version 2
       \end{itemize}
       \item IP 255.255.255.255
       \begin{itemize}
-        \item 涵義：目前網路的廣播位址。路由器不會轉發送往255.255.255.255的封包到其他網路。
+        \item 涵義：目前網路的廣播位址。目標為255.255.255.255的封包不會被路由器轉發到其他網路。
         \item 原因：連上網路的最初，用戶端不會知道DHCP伺服器的IP位址，因此廣播訊息給目前網路的所有裝置，期待有DHCP伺服器接收到。
       \end{itemize}
       \item MAC FF:FF:FF:FF:FF:FF
@@ -232,7 +232,8 @@ RiNG-Core(config)#ip ssh version 2
       \item \href{https://en.wikipedia.org/wiki/Broadcast_address}{Broadcast address - Wikipedia}
     \end{itemize}
 
-    \item Run the following commands to enable DHCP snooping:
+    \item Run the following commands to enable DHCP snooping and trust interface\\
+    \verb|FastEthernet0/22|:
 \begin{verbatim}
 RiNG-Core(config)#ip dhcp snooping
 RiNG-Core(config)#ip dhcp snooping vlan 1
