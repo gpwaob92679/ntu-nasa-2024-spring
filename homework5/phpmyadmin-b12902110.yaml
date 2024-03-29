@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin-b12902110
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin-b12902110
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin-b12902110
+    spec:
+      containers:
+      - name: phpmyadmin
+        image: phpmyadmin:latest

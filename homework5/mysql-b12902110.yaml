@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-b12902110
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-b12902110
+  template:
+    metadata:
+      labels:
+        app: mysql-b12902110
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:latest
+        env:
+        - name: MYSQL_HOST
+          value: b12902110
+        - name: MYSQL_ROOT_PASSWORD
+          value: $(MYSQL_ROOT_PASSWORD)
+

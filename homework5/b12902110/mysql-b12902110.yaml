@@ -1,0 +1,20 @@
+services:
+  db:
+    image: mysql:latest
+    networks:
+      - nasa-net
+    environment:
+      - MYSQL_HOST=b12902110
+      - MYSQL_ROOT_PASSWORD=secret
+
+  web:
+    image: phpmyadmin:latest
+    depends_on:
+      - db
+    ports:
+      - 8888:80
+    networks:
+      - nasa-net
+
+networks:
+  nasa-net:
