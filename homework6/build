@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rm -rf b12902110 b12902110.zip
+mkdir b12902110
+cp "b12902110_homework6.pdf" b12902110/b12902110.pdf
+cp "config-OPNsense.b12902110-20240331204523.xml" b12902110/b12902110.xml
+zip -r b12902110.zip b12902110
+rm -rf b12902110
