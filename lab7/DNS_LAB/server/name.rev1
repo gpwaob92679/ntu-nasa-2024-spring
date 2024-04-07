@@ -11,3 +11,4 @@ $TTL    604800
 
 ; name servers - PTR records
 3.2.20.172.in-addr.arpa.	IN	PTR	example.dnslab.com.
+2.2.20.172.in-addr.arpa.        IN      PTR     b12902110.dnslab.com.
