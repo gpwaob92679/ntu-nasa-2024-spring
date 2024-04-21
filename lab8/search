@@ -1,0 +1,6 @@
+#!/bin/bash
+# You should find your user with this command:
+ldapsearch -x -b dc=nasa,dc=csie,dc=ntu cn=b12902110
+# Edit /etc/ldap/ldap.conf so this also works:
+ldapsearch -x cn=b12902110
+# And submit a snapshot of the output.

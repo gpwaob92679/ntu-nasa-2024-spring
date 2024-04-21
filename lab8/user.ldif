@@ -1,0 +1,13 @@
+dn: uid=b12902110,ou=people,dc=nasa,dc=csie,dc=ntu
+objectClass: top
+objectClass: account
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: b12902110
+uid: b12902110
+uidNumber: 1234
+gidNumber: 123
+homeDirectory: /home/b12902110
+loginShell: /bin/bash
+# nasa2024-user
+userPassword: {SSHA}bY5km+mon2M6hcgudSPjC8ywaQVORG4P
