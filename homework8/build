@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rm -f b12902110.zip
+mkdir b12902110
+cp -r ldif scripts b12902110
+cp b12902110_homework8.pdf b12902110/report.pdf
+zip -r b12902110.zip b12902110
+rm -rf b12902110

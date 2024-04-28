@@ -1,0 +1,27 @@
+dn: uid=ta1,ou=people,dc=nasa,dc=csie,dc=ntu
+objectClass: top
+objectClass: account
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: ta1
+uid: ta1
+uidNumber: 1111
+gidNumber: 100
+homeDirectory: /home/ta1
+loginShell: /bin/bash
+# password: ta1
+userPassword: {SSHA}VJK0YEvGVD9EXyFRgUzZLCqPh+51AJe6
+
+dn: uid=b12902110,ou=people,dc=nasa,dc=csie,dc=ntu
+objectClass: top
+objectClass: account
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: b12902110
+uid: b12902110
+uidNumber: 2222
+gidNumber: 101
+homeDirectory: /home/b12902110
+loginShell: /bin/bash
+# password: b12902110
+userPassword: {SSHA}UUp1zw0J+1LAoopRqTz0flwBzjbIMmWr
