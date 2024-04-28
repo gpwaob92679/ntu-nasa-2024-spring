@@ -1,0 +1,7 @@
+# /dev/sda2
+UUID=ecd80d53-0bbd-430e-9ca2-27236433f1f4	/         	ext4      	rw,relatime	0 1
+
+# /dev/sda1
+UUID=27F2-9D88      	/efi      	vfat      	rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro	0 2
+192.168.30.1:/srv/nfs/share /mnt/nfs-share nfs defaults 0 0
+
