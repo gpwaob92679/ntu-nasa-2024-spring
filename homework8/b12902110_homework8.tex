@@ -269,7 +269,7 @@ $ ldapsearch -x -H ldap://192.168.8.0 -b dc=nasa,dc=csie,dc=ntu
 $ ldapmodify -Y EXTERNAL -H ldapi:/// -f security.ldif
       \end{Verbatim}
 
-      \item Set \verb|TLS_REQCERT allow| in the client's \verb|/etc/opneldap/ldap.conf|.
+      \item Set \verb|TLS_REQCERT allow| on the client's \verb|/etc/openldap/ldap.conf|.
       This allows bad certificates (our certificate is self-signed) to be ignored, and the
       session proceeds normally.
       \begin{Verbatim}[frame=single]
@@ -298,7 +298,7 @@ $ ldapsearch -x -H ldaps:/// -b dc=nasa,dc=csie,dc=ntu
     \begin{itemize}
       \item \href{https://wiki.archlinux.org/title/openLDAP#Start_slapd_with_SSL}{OpenLDAP - ArchWiki (2.5.3 Start slapd with SSL)}
       \item \href{https://serverfault.com/questions/459718/configure-openldap-with-tls-required}{ldap - Configure OpenLDAP with TLS=required - Server Fault}
-      \item \verb|man ladp.conf| and \verb|man slapd-config|
+      \item \verb|man ldap.conf| and \verb|man slapd-config|
     \end{itemize}
 
     \item \textbf{Steps}
@@ -310,7 +310,7 @@ $ pacman -S sssd sudo
 
       \item Edit \verb|/etc/sssd/sssd.conf| to the following configuration.
       \begin{Verbatim}[frame=single, fontsize=\footnotesize]
-#/etc/sssd/sssd.conf
+# /etc/sssd/sssd.conf
 [sssd]
 config_file_version = 2
 services = nss, pam, sudo
@@ -333,9 +333,9 @@ ldap_chpass_uri = ldap://192.168.8.0
 $ chmod 600 /etc/sssd/sssd.conf
       \end{Verbatim}
 
-      \item Edit the following options in  \verb|/etc/nsswitch.conf|.
+      \item Edit the following options in \verb|/etc/nsswitch.conf|.
       \begin{Verbatim}[frame=single, fontsize=\footnotesize]
-#/etc/nsswitch.conf
+# /etc/nsswitch.conf
 passwd: files systemd sss
 group: files [SUCCESS=merge] systemd sss
 shadow: files systemd sss
@@ -348,7 +348,7 @@ sudoers: files sss
       \pagebreak
       \item Add the following lines to \verb|/etc/pam.d/system-auth|.
       \begin{Verbatim}[frame=single, fontsize=\footnotesize, breaklines]
-#/etc/pam.d/system-auth
+# /etc/pam.d/system-auth
 auth sufficient pam_sss.so forward_pass
 auth required pam_faillock.so preauth
 
