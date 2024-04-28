@@ -1,0 +1,19 @@
+# AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
+# CRC32 e21bde8b
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+olcArgsFile: /var/run/slapd/slapd.args
+olcLogLevel: none
+olcPidFile: /var/run/slapd/slapd.pid
+olcToolThreads: 1
+structuralObjectClass: olcGlobal
+entryUUID: 06439370-9908-103e-98f8-197244dc3816
+creatorsName: cn=config
+createTimestamp: 20240427173337Z
+olcTLSCACertificateFile: /etc/ldap/cacert.pem
+olcTLSCertificateFile: /etc/ldap/servercrt.pem
+olcTLSCertificateKeyFile: /etc/ldap/serverkey.pem
+entryCSN: 20240427230518.957786Z#000000#000#000000
+modifiersName: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
+modifyTimestamp: 20240427230518Z
