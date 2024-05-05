@@ -304,7 +304,8 @@ TSWLatexianTemp*
 ###
 desktop.ini
 *.xlsx
-references.txt
+*references.txt
+*references.yaml
 
 nasa2024-hw0-sa-release
 
@@ -319,4 +320,5 @@ lab2/debugger.sh.sha1sum
 
 homework2/dir[1-2]
 homework2/output
-homework2/b12902110.zip
+
+b12902110.zip
