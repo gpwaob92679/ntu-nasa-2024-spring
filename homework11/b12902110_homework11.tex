@@ -54,7 +54,7 @@
     A \textbf{dynamic web server} constructs the response content during runtime with
     resources such as HTML templates, databases, or API calls.
 
-    A static web server usually handle requests faster than a dynamic web server
+    A static web server usually handles requests faster than a dynamic web server
     because no content has to be built by the server.
 
     \textbf{References}
@@ -65,18 +65,16 @@
 
     \pagebreak
     \item \textbf{Client-side rendering (CSR)}: The server sends a minimal HTML page
-    to the client, and the client then renders the main content dynamically using
-    JavaScript, which may include additional HTTP fetches and API calls.
-    A benefit of CSR is a smooth and interactive user experience, just like
-    using an app.
+    to the client, and the client then renders the main content  using JavaScript,
+    which may include additional HTTP fetches and API calls. One benefit of CSR is a smooth and interactive user experience, just like using an app.
 
     \textbf{Server-side rendering (SSR)}: When the client requests a page, the server
-    renders the complete page with data from databases or API calls, and then sends the
-    response to the client. A benefit of SSR is better search engine optimization than CSR.
+    renders the complete page with data from databases or API calls, and then sends it
+    to the client. One benefit of SSR is better search engine optimization than CSR.
 
     \textbf{Static-site generation (SSG)}: The whole website is rendered into
-    static pages during build time. The main benefit of SSG excellent performance and
-    fast loading times.
+    static pages during build time. The main benefit of SSG is excellent performance
+    and fast loading times.
 
     \textbf{Incremental static regeneration (ISR)}: ISR allows static pages
     to be built on a per-page basis. A page will be generated upon first request,
@@ -92,7 +90,7 @@
       \item \href{https://nextjs.org/docs/pages/building-your-application/data-fetching/incremental-static-regeneration}{Data Fetching: Incremental Static Regeneration (ISR) | Next.js}
     \end{itemize}
 
-    \item A \textbf{proxy} is an intermediate between the client and server. When the client
+    \item A \textbf{proxy} is an intermediary between the client and server. When the client
     wants to access a resource, the request goes to the proxy instead of directly to
     the server. The proxy performs the request to the server, receives the response,
     and then sends the response back to the client.
@@ -134,21 +132,20 @@
     \begin{enumerate}[label=(\arabic*)]
       \item Run the following commands to prepare the VM.
       \begin{Verbatim}[frame=single]
-$ cp -r /tmp2/nasa-hw11 /tmp2/b1290110
+$ cp -r /tmp2/nasa-hw11 /tmp2/b12902110
 $ cd /tmp2/b12902110/nasa-hw11
 $ qemu-img create -f qcow2 disk0.qcow2 20G
       \end{Verbatim}
       \item Create \verb|/tmp2/b12902110/nasa-hw11/run_vm.sh| as the following.
       \inputminted[fontsize=\scriptsize]{shell}{run_vm.sh}
-      \item Boot up the VM, connect to it via QEMU's VNC, and follow the Debian installation guide. After the installation finished, reboot into the VM.
+      \item Boot up the VM, connect to it via QEMU's VNC, and follow the Debian installer. After the installation has finished, reboot into the VM.
       \item Configure sudo as the root user.
       \begin{Verbatim}[frame=single]
 $ su -
 # apt install -y sudo
 # usermod -aG sudo b12902110
       \end{Verbatim}
-      \item Re-login as user b12902110. Install the necessary package for our
-      web server.
+      \item Re-login as user b12902110. Install package \verb|nginx|.
       \begin{Verbatim}[frame=single]
 $ sudo apt install -y nginx
       \end{Verbatim}
@@ -169,7 +166,7 @@ $ sudo systemctl start nginx.service
 
     \item \textbf{Steps}
     \begin{enumerate}[label=(\arabic*)]
-      \item Install \verb|ufw|.
+      \item Install package \verb|ufw|.
       \begin{Verbatim}[frame=single]
 $ sudo apt install -y ufw
       \end{Verbatim}
@@ -188,13 +185,13 @@ $ sudo ufw enable
     This part is done after the last problem, so we have more services than an HTTP
     and an SSH service.
 
-    In the QEMU console, add another port forwarding rule: 11088 on the host to
+    In the QEMU console, add another port forwarding rule: 11088 from the host to
     8888 on the VM.
     \begin{Verbatim}[frame=single]
 (qemu) hostfwd_add tcp::11088-:8888
     \end{Verbatim}
 
-    Therefore, we have 4 port forwarding rules.
+    Therefore, we have a total of four port forwarding rules.
 
     \begin{tabular}{|ll|}
       \hline
@@ -206,7 +203,8 @@ $ sudo ufw enable
       \hline
     \end{tabular}
 
-    All of the 4 ports has a service running on it.
+    \vspace{\baselineskip}
+    Each of the four ports has a service running on it.
 
     \includegraphics[width=0.8\textwidth]{7_netstat.png}
 
@@ -304,6 +302,7 @@ $ sudo systemctl reload nginx.service
 
     \includegraphics[width=0.6\textwidth]{10_result_before.png}
 
+    \vspace{\baselineskip}
     After restriction:
 
     \includegraphics[width=0.8\textwidth]{10_result_after.png}
@@ -317,7 +316,7 @@ $ sudo systemctl reload nginx.service
     \pagebreak
     \item \textbf{Steps}
 
-    View the last few lines of \verb|/var/log/nginx/access.log|/
+    View the last few lines of \verb|/var/log/nginx/access.log|.
     \begin{Verbatim}[frame=single]
 $ sudo tail /var/log/nginx/access.log
     \end{Verbatim}
@@ -356,20 +355,20 @@ $ sudo tail /var/log/nginx/access.log
     \begin{enumerate}[resume]
       \item \textbf{Steps (Server)}
       \begin{enumerate}[label=(\arabic*)]
-        \item Create an CA key and certificate.
+        \item Create a CA key and certificate.
         \begin{Verbatim}[frame=single]
 $ openssl req -new -x509 -noenc -days 365000 -newkey rsa:2048 \
     -keyout ca-key.pem -out ca-cert.pem \
     -subj "/C=TW/O=NTU CSIE/OU=NASA/CN=b12902110 Root CA"
         \end{Verbatim}
-        \item Create a server key and certificate request.
+        \item Create a key and certificate request for our server.
         \begin{Verbatim}[frame=single]
 $ openssl req -new -noenc -newkey rsa:2048 \
     -keyout server-key.pem -out server-req.pem \
     -subj "/C=TW/O=NTU CSIE/OU=NASA/CN=nasa-hw11" \
     -addext "subjectAltName = DNS:*.csie.ntu.edu.tw"
         \end{Verbatim}
-        \item Sign the server certificate.
+        \item Sign the server certificate with the CA.
         \begin{Verbatim}[frame=single]
 $ openssl x509 -req -days 365000 -copy_extensions copyall \
     -in server-req.pem -out server-cert.pem \
@@ -377,13 +376,13 @@ $ openssl x509 -req -days 365000 -copy_extensions copyall \
 Certificate request self-signature ok
 subject=C = TW, O = NTU CSIE, OU = NASA, CN = nasa-hw11
         \end{Verbatim}
-
-        \item Install the certificate and key to \verb|/etc/nginx|.
+        \item Install the server certificate and key to \verb|/etc/nginx|.
         \begin{Verbatim}[frame=single]
 $ sudo cp server-key.pem server-cert.pem /etc/nginx
 $ sudo chown www-data:www-data /etc/nginx/server-key.pem
         \end{Verbatim}
-        \item Add the following directives in \verb|/etc/nginx/sites-available/default|.
+        \item Add the following directives to \verb|server| in\\
+        \verb|/etc/nginx/sites-available/default|.
         \begin{Verbatim}[frame=single]
 server {
   ...
@@ -443,7 +442,7 @@ $ sudo systemctl reload nginx.service
       \inputminted{nginx}{server/etc/nginx/sites-available/hostA}
       \item Create \verb|/etc/nginx/sites-available/hostB| as the following.
       \inputminted{nginx}{server/etc/nginx/sites-available/hostB}
-      \item Enable both \verb|hostA| and \verb|hostB|.
+      \item Enable both \verb|hostA| and \verb|hostB| sites.
       \begin{Verbatim}[frame=single]
 $ sudo ln -s /etc/nginx/sites-available/hostA \
     /etc/nginx/sites-enabled/hostA
@@ -454,7 +453,7 @@ $ sudo ln -s /etc/nginx/sites-available/hostB \
       \inputminted{html}{server/var/www/hostA/index.html}
       \item Create \verb|/var/www/hostB/index.html| as the following.
       \inputminted{html}{server/var/www/hostB/index.html}
-      \item Add \verb|/hostA| and \verb|/hostB| location blocks to
+      \item Add \verb|/hostA| and \verb|/hostB| locations to
       \verb|/etc/nginx/sites-available/default|.
       \begin{Verbatim}[frame=single]
 server {
