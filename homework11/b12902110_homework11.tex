@@ -1,5 +1,4 @@
 \documentclass[12pt, a4paper]{article}
-\usepackage{amsmath}
 \usepackage{enumitem}
 \usepackage{float}
 \usepackage[left=2cm, right=2cm, top=2cm, bottom=2cm]{geometry}
@@ -30,22 +29,110 @@
 
   \section*{Web Terminology}
   \begin{enumerate}
-    \item
+    \item \phantom{}\vspace{-\baselineskip}
 
-    \item
+    \begin{tabular}{|c|c|c|}
+      \hline
+      & \textbf{Apache} & \textbf{Nginx} \\\hline
+      Asynchronous, event-driven & Via event MPM & Native \\\hline
+      Mail proxy support & No & Yes \\\hline
+      License & Apache License 2.0 & 2-Clause BSD License \\\hline
+    \end{tabular}
+    \vspace{\baselineskip}
 
-    \item
+    \textbf{References}
+    \begin{itemize}
+      \item \href{https://en.wikipedia.org/wiki/Apache_HTTP_Server}{Apache HTTP Server - Wikipedia}
+      \item \href{https://en.wikipedia.org/wiki/Nginx}{Nginx - Wikipedia}
+      \item \href{https://www.nginx.com/blog/thread-pools-boost-performance-9x/}{Boosting NGINX Performance 9x with Thread Pools}
+      \item \href{https://httpd.apache.org/docs/2.4/mod/event.html}{event - Apache HTTP Server Version 2.4}
+      \item \href{https://www.digitalocean.com/community/tutorials/apache-vs-nginx-practical-considerations}{Apache vs Nginx: Practical Considerations  | DigitalOcean}
+    \end{itemize}
 
-    \item
+    \item A \textbf{static web server} sends out files hosted on the server as-is.
 
-    \item
+    A \textbf{dynamic web server} constructs the response content during runtime with
+    resources such as HTML templates, databases, or API calls.
+
+    A static web server usually handle requests faster than a dynamic web server
+    because no content has to be built by the server.
+
+    \textbf{References}
+    \begin{itemize}
+      \item \href{https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_web_server}{What is a web server? - Learn web development | MDN}
+      \item \href{https://en.wikipedia.org/wiki/Dynamic_web_page}{Dynamic web page - Wikipedia}
+    \end{itemize}
+
+    \pagebreak
+    \item \textbf{Client-side rendering (CSR)}: The server sends a minimal HTML page
+    to the client, and the client then renders the main content dynamically using
+    JavaScript, which may include additional HTTP fetches and API calls.
+    A benefit of CSR is a smooth and interactive user experience, just like
+    using an app.
+
+    \textbf{Server-side rendering (SSR)}: When the client requests a page, the server
+    renders the complete page with data from databases or API calls, and then sends the
+    response to the client. A benefit of SSR is better search engine optimization than CSR.
+
+    \textbf{Static-site generation (SSG)}: The whole website is rendered into
+    static pages during build time. The main benefit of SSG excellent performance and
+    fast loading times.
+
+    \textbf{Incremental static regeneration (ISR)}: ISR allows static pages
+    to be built on a per-page basis. A page will be generated upon first request,
+    and future requests within a certain amount of time will be served from cache.
+    It offers better performance than SSR because only certain pages rather than
+    the whole website has to be regenerated upon content change.
+
+    \textbf{References}
+    \begin{itemize}
+      \item \href{https://www.shubo.io/rendering-patterns/}{[教學] SSR 與 CSR 深度解析：從渲染方式到效能優化 - Shubo 的程式開發筆記}
+      \item \href{https://bootcamp.uxdesign.cc/understanding-csr-ssr-ssg-and-isr-a-next-js-perspective-fcaf36686de6}{Understanding CSR, SSR, SSG, and ISR: A Next.js Perspective | by Aditya Kumar Tiwari | Bootcamp}
+      \item \href{https://www.educative.io/answers/ssr-vs-csr-vs-isr-vs-ssg}{SSR vs CSR vs ISR vs SSG}
+      \item \href{https://nextjs.org/docs/pages/building-your-application/data-fetching/incremental-static-regeneration}{Data Fetching: Incremental Static Regeneration (ISR) | Next.js}
+    \end{itemize}
+
+    \item A \textbf{proxy} is an intermediate between the client and server. When the client
+    wants to access a resource, the request goes to the proxy instead of directly to
+    the server. The proxy performs the request to the server, receives the response,
+    and then sends the response back to the client.
+
+    Some benefits of a proxy are:
+    \begin{itemize}
+      \item \textbf{Security}: Mask the IP address of the client.
+      \item \textbf{Filtering}: Filter out unwanted content.
+      \item \textbf{Caching}: Cache frequently accessed resources for performance.
+    \end{itemize}
+
+    \textbf{References}
+    \begin{itemize}
+      \item \href{https://en.wikipedia.org/wiki/Proxy_server}{Proxy server - Wikipedia}
+    \end{itemize}
+
+    \item A \textbf{reverse proxy} is a proxy server that acts to clients just like a
+    normal web server, but actually forwards requests to and responses from one or more web
+    servers behind it.
+
+    Some benefits of a reverse proxy server are:
+    \begin{itemize}
+      \item \textbf{Load balancing}: Distribute load among multiple servers.
+      \item \textbf{Security}: Only the reverse proxies have to be exposed to the public,
+      while the actual web servers can be hidden behind a firewall.
+      \item \textbf{Caching}: Cache frequently accessed resources for performance.
+    \end{itemize}
+
+    \textbf{References}
+    \begin{itemize}
+      \item \href{https://en.wikipedia.org/wiki/Reverse_proxy}{Reverse proxy - Wikipedia}
+    \end{itemize}
   \end{enumerate}
 
+  \pagebreak
   \section*{Web Server Configurations}
   \begin{enumerate}[resume]
     \item \textbf{Steps}
     \begin{enumerate}[label=(\arabic*)]
-      \item Run the following commands.
+      \item Run the following commands to prepare the VM.
       \begin{Verbatim}[frame=single]
 $ cp -r /tmp2/nasa-hw11 /tmp2/b1290110
 $ cd /tmp2/b12902110/nasa-hw11
@@ -56,7 +143,7 @@ $ qemu-img create -f qcow2 disk0.qcow2 20G
       \item Boot up the VM, connect to it via QEMU's VNC, and follow the Debian installation guide. After the installation finished, reboot into the VM.
       \item Configure sudo as the root user.
       \begin{Verbatim}[frame=single]
-$ su
+$ su -
 # apt install -y sudo
 # usermod -aG sudo b12902110
       \end{Verbatim}
@@ -121,19 +208,22 @@ $ sudo ufw enable
 
     All of the 4 ports has a service running on it.
 
-    \includegraphics[width=0.7\textwidth]{7_netstat.png}
+    \includegraphics[width=0.8\textwidth]{7_netstat.png}
 
+    \pagebreak
     However, only ports 22, 80, and 443 are accessible from outside
     the VM.
 
-    \includegraphics[width=0.7\textwidth]{7_access.png}
+    \includegraphics[width=0.8\textwidth]{7_access.png}
 
-   \textbf{References}
-   \begin{itemize}
+    \vspace{\baselineskip}
+    \textbf{References}
+    \begin{itemize}
      \item \href{https://www.digitalocean.com/community/tutorials/opening-a-port-on-linux}{How To Open a Port on Linux  | DigitalOcean}
      \item \href{https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-ubuntu}{How to Set Up a Firewall with UFW on Ubuntu  | DigitalOcean}
-   \end{itemize}
+    \end{itemize}
 
+    \pagebreak
     \item \textbf{Steps}
 
     Create \verb|/var/www/html/index.html| as the following.
@@ -141,8 +231,9 @@ $ sudo ufw enable
 
     \textbf{Result}
 
-    \includegraphics[width=0.5\textwidth]{8_result.png}
+    \includegraphics[width=0.6\textwidth]{8_result.png}
 
+    \pagebreak
     \item \textbf{Steps}
     \begin{enumerate}[label=(\arabic*)]
       \item Add the following \verb|location| block into
@@ -175,6 +266,7 @@ $ sudo systemctl reload nginx.service
 
     \includegraphics[width=0.6\textwidth]{9_result.png}
 
+    \vspace{\baselineskip}
     \textbf{References}
     \begin{itemize}
       \item \href{https://stackoverflow.com/questions/42605637/nginx-user-public-home-without}{nginx user public home without ~ - Stack Overflow}
@@ -182,6 +274,7 @@ $ sudo systemctl reload nginx.service
       \item \href{https://nginx.org/en/docs/http/ngx_http_core_module.html}{Module ngx\_http\_core\_module}
     \end{itemize}
 
+    \pagebreak
     \item \textbf{Steps}
     \begin{enumerate}[label=(\arabic*)]
       \item Add the following \verb|location| block into
@@ -215,11 +308,13 @@ $ sudo systemctl reload nginx.service
 
     \includegraphics[width=0.8\textwidth]{10_result_after.png}
 
+    \vspace{\baselineskip}
     \textbf{References}
     \begin{itemize}
       \item \href{https://nginx.org/en/docs/http/ngx_http_access_module.html}{Module ngx\_http\_access\_module}
     \end{itemize}
 
+    \pagebreak
     \item \textbf{Steps}
 
     View the last few lines of \verb|/var/log/nginx/access.log|/
@@ -229,67 +324,66 @@ $ sudo tail /var/log/nginx/access.log
 
     \textbf{Result}
 
-    \includegraphics[width=0.93\textwidth]{11_result.png}
+    Chrome DevTools:
 
+    \includegraphics[width=0.93\textwidth]{11_devtools.png}
+
+    \verb|/var/log/nginx/access.log|:
+
+    \includegraphics[width=0.93\textwidth]{11_log.png}
+
+    \vspace{\baselineskip}
     \textbf{References}
     \begin{itemize}
       \item \href{https://docs.nginx.com/nginx/admin-guide/monitoring/logging/}{Configuring Logging | NGINX Documentation}
     \end{itemize}
 
+    \pagebreak
     \item
     \begin{enumerate}
-      \item
+      \item TLS uses PKI in the handshake process to authenticate identities of the
+      communicating hosts.
 
-      \item
+      \item A CA is a trusted third party that issues and signs digital certificates.
+    \end{enumerate}
 
+    \textbf{References}
+    \begin{itemize}
+      \item \href{https://en.wikipedia.org/wiki/Transport_Layer_Security}{Transport Layer Security - Wikipedia}
+      \item \href{https://en.wikipedia.org/wiki/Public_key_infrastructure}{Public key infrastructure - Wikipedia}
+    \end{itemize}
+
+    \begin{enumerate}[resume]
       \item \textbf{Steps (Server)}
       \begin{enumerate}[label=(\arabic*)]
-        \item Create CA key and certificate.
-        \begin{Verbatim}[frame=single, fontsize=\footnotesize]
-$ openssl req -new -x509 -noenc -days 365000 -keyout ca-key.pem \
-    -out ca-cert.pem
-
-...
-
------
-Country Name (2 letter code) [AU]:TW
-State or Province Name (full name) [Some-State]:Taiwan
-Locality Name (eg, city) []:
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:NTU CSIE
-Organizational Unit Name (eg, section) []:
-Common Name (e.g. server FQDN or YOUR name) []:
-Email Address []:
+        \item Create an CA key and certificate.
+        \begin{Verbatim}[frame=single]
+$ openssl req -new -x509 -noenc -days 365000 -newkey rsa:2048 \
+    -keyout ca-key.pem -out ca-cert.pem \
+    -subj "/C=TW/O=NTU CSIE/OU=NASA/CN=b12902110 Root CA"
         \end{Verbatim}
-        \item Create server key and certificate request.
-        \begin{Verbatim}[frame=single, fontsize=\footnotesize]
-$ openssl req -new -noenc -keyout server-key.pem -out server-req.pem
-
-...
-
------
-Country Name (2 letter code) [AU]:TW
-State or Province Name (full name) [Some-State]:Taiwan
-Locality Name (eg, city) []:
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:NTU CSIE
-Organizational Unit Name (eg, section) []:
-Common Name (e.g. server FQDN or YOUR name) []:nasa-hw11
-Email Address []:
+        \item Create a server key and certificate request.
+        \begin{Verbatim}[frame=single]
+$ openssl req -new -noenc -newkey rsa:2048 \
+    -keyout server-key.pem -out server-req.pem \
+    -subj "/C=TW/O=NTU CSIE/OU=NASA/CN=nasa-hw11" \
+    -addext "subjectAltName = DNS:*.csie.ntu.edu.tw"
         \end{Verbatim}
         \item Sign the server certificate.
         \begin{Verbatim}[frame=single]
-$ openssl x509 -req -days 365000 -in server-req.pem \
-    -out server-cert.pem -CA ca-cert.pem -CAkey ca-key.pem
+$ openssl x509 -req -days 365000 -copy_extensions copyall \
+    -in server-req.pem -out server-cert.pem \
+    -CA ca-cert.pem -CAkey ca-key.pem
 Certificate request self-signature ok
-subject=C = TW, ST = Taiwan, O = NTU CSIE, CN = nasa-hw11
+subject=C = TW, O = NTU CSIE, OU = NASA, CN = nasa-hw11
         \end{Verbatim}
 
-        \item Install the certificates to \verb|/etc/nginx|.
+        \item Install the certificate and key to \verb|/etc/nginx|.
         \begin{Verbatim}[frame=single]
 $ sudo cp server-key.pem server-cert.pem /etc/nginx
 $ sudo chown www-data:www-data /etc/nginx/server-key.pem
         \end{Verbatim}
-        \item Configure the following \verb|server| settings in\\
-        \verb|/etc/nginx/sites-available/default|.
+        \item Add the following directives in \verb|/etc/nginx/sites-available/default|.
         \begin{Verbatim}[frame=single]
 server {
   ...
@@ -308,6 +402,7 @@ $ sudo systemctl reload nginx.service
         \end{Verbatim}
       \end{enumerate}
 
+      \pagebreak
       \textbf{Steps (Windows Client)}
 
       Run \verb|certmgr.msc|, and install \verb|ca-cert.pem| to
@@ -315,6 +410,7 @@ $ sudo systemctl reload nginx.service
 
       \includegraphics[width=0.87\textwidth]{12-c_certmgr.png}
 
+      \vspace{\baselineskip}
       \textbf{Result}
 
       Certificates:
@@ -322,23 +418,23 @@ $ sudo systemctl reload nginx.service
       \includegraphics[width=0.43\textwidth]{12-c_ca-cert.png}
       \includegraphics[width=0.43\textwidth]{12-c_server-cert.png}
 
+      \pagebreak
       Browser:
 
-      \includegraphics[width=0.6\textwidth]{12-c_browser.png}
+      \includegraphics[width=0.87\textwidth]{12-c_browser.png}
 
-      Since we're using NAT here, it still shows up as insecure due to\\
-      \verb|NET::ERR_CERT_COMMON_NAME_INVALID|.
-
+      \vspace{\baselineskip}
       \textbf{References}
       \begin{itemize}
         \item \href{https://mariadb.com/docs/server/security/data-in-transit-encryption/create-self-signed-certificates-keys-openssl/}{Create Self-Signed Certificates and Keys with OpenSSL — MariaDB Documentation}
         \item \href{https://www.openssl.org/docs/man3.0/man1/openssl-req.html}{/docs/man3.0/man1/openssl-req.html}
         \item \href{https://www.openssl.org/docs/man3.0/man1/openssl-x509.html}{/docs/man3.0/man1/openssl-x509.html}
+        \item \href{https://security.stackexchange.com/questions/74345/provide-subjectaltname-to-openssl-directly-on-the-command-line}{certificates - Provide subjectAltName to openssl directly on the command line - Information Security Stack Exchange}
       \end{itemize}
-
     \end{enumerate}
   \end{enumerate}
 
+  \pagebreak
   \section*{Reverse Proxy}
   \begin{enumerate}[resume]
     \item \textbf{Steps}
@@ -386,6 +482,7 @@ $ sudo systemctl reload nginx.service
     \includegraphics[width=0.45\textwidth]{13_hostA.png}
     \includegraphics[width=0.45\textwidth]{13_hostB.png}
 
+    \vspace{\baselineskip}
     \textbf{References}
     \begin{itemize}
       \item \href{https://nginx.org/en/docs/beginners_guide.html}{Beginner's Guide}
